@@ -5,6 +5,7 @@
 
 #include "Blueprint/UserWidget.h"
 #include "UI/Widget/AuraWidget.h"
+#include "UI/WidgetController/MenuWidgetController.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
 
 UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetControllerParams& WidgetControllerParams)
@@ -20,14 +21,30 @@ UOverlayWidgetController* AAuraHUD::GetOverlayWidgetController(const FWidgetCont
 	return OverlayWidgetController;
 }
 
+UMenuWidgetController* AAuraHUD::GetMenuWidgetController(const FWidgetControllerParams& WidgetControllerParams)
+{
+	if (!MenuWidgetController)
+	{
+		MenuWidgetController = NewObject<UMenuWidgetController>(this, MenuWidgetControllerClass);
+		MenuWidgetController->SetWidgetControllerParams(WidgetControllerParams);
+		MenuWidgetController->BindCallbacksToDependencies();
+
+		return MenuWidgetController;
+	}
+	return MenuWidgetController;
+}
+
 void AAuraHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)
 {
 	checkf(OverlayWidgetClass, TEXT("Overlay Widget Class not initialize, please fill out BP_AuraHUD"));
 	checkf(OverlayWidgetControllerClass, TEXT("Overlay Widget Controller Class not initialize, please fill out BP_AuraHUD"))
+	
+	checkf(MenuWidgetClass, TEXT("Menu Widget Class not initialize, please fill out BP_AuraHUD"));
+	checkf(MenuWidgetControllerClass, TEXT("Menu Widget Controller Class not initialize, please fill out BP_AuraHUD"))
 
 	UUserWidget* UserWidget = CreateWidget<UUserWidget>(GetWorld(), OverlayWidgetClass);
 	OverlayWidget = Cast<UAuraWidget>(UserWidget);
-
+	
 	const FWidgetControllerParams WidgetControllerParams(PC, PS, ASC, AS);
 	UOverlayWidgetController* WidgetController = GetOverlayWidgetController(WidgetControllerParams);
 
