@@ -30,51 +30,16 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 
 void AAuraPlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;
 	ThisActor = CursorHit.GetActor();
-
-	/**
-	 * Line trace from cursor. There're several scenarios:
-	 *	A- LastActor is null && ThisActor is null
-	 *		- Do nothing.
-	 *	B- LastActor is null && ThisActor is valid
-	 *		- Highlight ThisActor
-	 *	C- LastActor is valid && ThisActor is null
-	 *		- UnHighlight LastActor
-	 *	D- Both actors are valide but ThisActor != LastActor
-	 *		- Highlight ThisActor && UnHighlight LastActor
-	 *	E- Both actors are valide and same actor
-	 *		- Do nothing
-	 */
-
-	if (LastActor == nullptr)
+	
+	if (LastActor != ThisActor)
 	{
-		if (ThisActor != nullptr)
-		{
-			// Case B
-			ThisActor->HighlightActor();
-		}
-	}
-	else // Last actor is valid
-	{
-		if (ThisActor != nullptr) // Both are valid
-		{
-			if (LastActor != ThisActor)
-			{
-				// Case D
-				LastActor->UnHighlightActor();
-				ThisActor->HighlightActor();
-			}
-		}
-		else 
-		{
-			// Case C
-			LastActor->UnHighlightActor();
-		}
+		if (LastActor) LastActor->UnHighlightActor();
+		if (ThisActor) ThisActor->HighlightActor();
 	}
 }
 
@@ -91,39 +56,30 @@ void AAuraPlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 {
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 		return;
 	}
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagReleased(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 	}
 	else
 	{
-		if (FollowTime <= ShortPressThreshold)
+		if (const APawn* ControlledPawn = GetPawn(); FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
-			if (const APawn* ControlledPawn = GetPawn(); FollowTime <= ShortPressThreshold && ControlledPawn)
+			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 			{
-				if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+				Spline->ClearSplinePoints();
+				for (const FVector& PointLoc : NavPath->PathPoints)
 				{
-					Spline->ClearSplinePoints();
-					for (const FVector& PointLoc : NavPath->PathPoints)
-					{
-						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					}
-					CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num()-1];
-					bAutoRunning = true;
+					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 				}
+				CachedDestination = NavPath->PathPoints[NavPath->PathPoints.Num()-1];
+				bAutoRunning = true;
 			}
-			FollowTime = 0.f;
-			bTargeting = false;
 		}
+		FollowTime = 0.f;
+		bTargeting = false;
 	}
 }
 
@@ -131,27 +87,17 @@ void AAuraPlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 {
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 		return;
 	}
 	if (bTargeting)
 	{
-		if (GetASC())
-		{
-			GetASC()->AbilityInputTagHeld(InputTag);
-		}
+		if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 	}
 	else
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
-		FHitResult HitResult;
-		if (GetHitResultUnderCursor(ECC_Visibility, false, HitResult))
-		{
-			CachedDestination = HitResult.ImpactPoint;
-		}
+		if (CursorHit.bBlockingHit) CachedDestination = CursorHit.ImpactPoint;
 
 		if (APawn* ControlledPawn = GetPawn())
 		{
