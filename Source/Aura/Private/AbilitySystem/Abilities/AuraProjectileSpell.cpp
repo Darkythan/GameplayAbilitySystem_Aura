@@ -11,8 +11,11 @@ void UAuraProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Hand
                                            const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
 
-	if (HasAuthority(&ActivationInfo))
+void UAuraProjectileSpell::SpawnFireBolt() const
+{
+	if (GetAvatarActorFromActorInfo()->HasAuthority())
 	{
 		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 		{
