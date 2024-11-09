@@ -53,7 +53,7 @@ void UTargetDataUnderMouse::SendMouseCursorData() const
 }
 
 void UTargetDataUnderMouse::OnTargetDataReplicatedCallback(const FGameplayAbilityTargetDataHandle& DataHandle,
-	FGameplayTag ActivationTag)
+	FGameplayTag ActivationTag) const
 {
 	AbilitySystemComponent->ConsumeClientReplicatedTargetData(GetAbilitySpecHandle(), GetActivationPredictionKey());
 	if (ShouldBroadcastAbilityTaskDelegates())
