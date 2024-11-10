@@ -3,6 +3,8 @@
 
 #include "AbilitySystem/AuraAbilityFunctionLibrary.h"
 
+#include "AbilitySystemComponent.h"
+#include "Game/AuraGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/AuraHUD.h"
@@ -40,4 +42,26 @@ UMenuWidgetController* UAuraAbilityFunctionLibrary::GetMenuWidgetController(cons
 		}
 	}
 	return nullptr;
+}
+
+void UAuraAbilityFunctionLibrary::InitializeDefaultAttributes(ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* AbilitySystemComponent, const UObject* WorldContext)
+{
+	if (const AAuraGameModeBase* AuraGameModeBase = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContext)))
+	{
+		UCharacterClassInfo* ClassInfo = AuraGameModeBase->CharacterClassInfo;
+		const FCharacterClassDefaultInfo ClassDefaultInfo = ClassInfo->GetClassDefaultInfo(CharacterClass);
+
+		const AActor* AvatarActor = AbilitySystemComponent->GetAvatarActor();
+		FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
+		EffectContextHandle.AddSourceObject(AvatarActor);
+		
+		const FGameplayEffectSpecHandle PrimaryEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ClassDefaultInfo.PrimaryAttributes, Level, EffectContextHandle);
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*PrimaryEffectSpecHandle.Data.Get());
+		
+		const FGameplayEffectSpecHandle SecondaryEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ClassInfo->SecondaryAttributes, Level, EffectContextHandle);
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SecondaryEffectSpecHandle.Data.Get());
+		
+		const FGameplayEffectSpecHandle VitalEffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ClassInfo->VitalAttributes, Level, EffectContextHandle);
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalEffectSpecHandle.Data.Get());
+	}
 }
