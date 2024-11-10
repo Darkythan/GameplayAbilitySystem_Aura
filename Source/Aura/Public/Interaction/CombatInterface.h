@@ -31,4 +31,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateWarpTarget(const FVector& TargetLocation);
+	
+	virtual void Die();
 };

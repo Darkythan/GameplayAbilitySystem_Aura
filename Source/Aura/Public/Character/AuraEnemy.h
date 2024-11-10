@@ -40,6 +40,11 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	float BaseWalkSpeed = 250.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	float LifeSpan = 5.f;
+	
+	virtual void Die() override;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
