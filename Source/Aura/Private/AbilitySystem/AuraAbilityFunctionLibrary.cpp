@@ -65,3 +65,17 @@ void UAuraAbilityFunctionLibrary::InitializeDefaultAttributes(ECharacterClass Ch
 		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*VitalEffectSpecHandle.Data.Get());
 	}
 }
+
+void UAuraAbilityFunctionLibrary::GiveStartupAbilities(UAbilitySystemComponent* AbilitySystemComponent,
+	const UObject* WorldContext)
+{
+	if (const AAuraGameModeBase* AuraGameModeBase = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContext)))
+	{
+		for (UCharacterClassInfo* ClassInfo = AuraGameModeBase->CharacterClassInfo;
+			const TSubclassOf<UGameplayAbility> AbilityClass : ClassInfo->CommonAbilities)
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1.f);
+			AbilitySystemComponent->GiveAbility(AbilitySpec);
+		}
+	}
+}

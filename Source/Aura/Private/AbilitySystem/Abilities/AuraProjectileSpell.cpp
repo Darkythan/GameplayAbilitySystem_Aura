@@ -5,6 +5,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "Actor/AuraProjectile.h"
 #include "Interaction/CombatInterface.h"
 
@@ -29,11 +30,16 @@ void UAuraProjectileSpell::SpawnFireBolt(const FVector TargetLocation) const
 			SpawnTransform.SetLocation(SocketLocation);
 			SpawnTransform.SetRotation(Rotator.Quaternion());
 			
-			AAuraProjectile* Projectile =  GetWorld()->SpawnActorDeferred<AAuraProjectile>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
+			AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
 				Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 			const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
 			const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+
+			const FAuraGameplayTags AuraGameplayTags = FAuraGameplayTags::Get();
+			const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
+
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle,AuraGameplayTags.Damage, ScaledDamage);
 			Projectile->DamageEffectSpecHandle = EffectSpecHandle;
 			
 			if (Projectile)

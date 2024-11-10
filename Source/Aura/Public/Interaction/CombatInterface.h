@@ -26,6 +26,9 @@ public:
 
 	virtual FVector GetCombatSocketLocation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UAnimMontage* GetHitReactMontage();
+	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateWarpTarget(const FVector& TargetLocation);
 };
