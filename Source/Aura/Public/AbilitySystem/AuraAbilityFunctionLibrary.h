@@ -28,4 +28,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void GiveStartupAbilities(UAbilitySystemComponent* AbilitySystemComponent, const UObject* WorldContext);
+
+	UFUNCTION(BlueprintCallable)
+	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContext);
 };
