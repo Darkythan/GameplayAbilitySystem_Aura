@@ -34,7 +34,20 @@ void UAuraProjectileSpell::SpawnFireBolt(const FVector TargetLocation) const
 				Cast<APawn>(GetOwningActorFromActorInfo()), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 			const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-			const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+			
+			FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
+			EffectContextHandle.SetAbility(this);
+			EffectContextHandle.AddSourceObject(Projectile);
+
+			TArray<TWeakObjectPtr<AActor>> Actors;
+			Actors.Add(Projectile);
+			EffectContextHandle.AddActors(Actors);
+
+			FHitResult HitResult;
+			HitResult.Location = TargetLocation;
+			EffectContextHandle.AddHitResult(HitResult);
+		
+			const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 
 			const FAuraGameplayTags AuraGameplayTags = FAuraGameplayTags::Get();
 			const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
