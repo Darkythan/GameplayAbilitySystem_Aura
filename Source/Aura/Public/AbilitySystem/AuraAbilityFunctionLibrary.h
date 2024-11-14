@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AuraAbilityTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Data/CharacterClassInfo.h"
 #include "AuraAbilityFunctionLibrary.generated.h"
@@ -31,4 +32,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContext);
+
+	UFUNCTION(BlueprintPure)
+	static bool IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
+	
+	UFUNCTION(BlueprintPure)
+	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintCallable)
+	static void SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bBlocked);
+
+	UFUNCTION(BlueprintCallable)
+	static void SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bCriticalHit);
 };

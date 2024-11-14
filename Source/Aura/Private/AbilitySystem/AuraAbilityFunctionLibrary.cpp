@@ -86,3 +86,38 @@ UCharacterClassInfo* UAuraAbilityFunctionLibrary::GetCharacterClassInfo(const UO
 	}
 	return nullptr;
 }
+
+bool UAuraAbilityFunctionLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool UAuraAbilityFunctionLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void UAuraAbilityFunctionLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bBlocked)
+{
+	if (FAuraGameplayEffectContext* AuraContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraContext->SetIsBlockedHit(bBlocked);
+	}
+}
+
+void UAuraAbilityFunctionLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle,
+	const bool bCriticalHit)
+{
+	if (FAuraGameplayEffectContext* AuraContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraContext->SetIsBlockedHit(bCriticalHit);
+	}
+}
