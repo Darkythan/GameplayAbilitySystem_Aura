@@ -23,8 +23,7 @@ void UAuraProjectileSpell::SpawnFireBolt(const FVector TargetLocation) const
 		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo()))
 		{
 			const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
-			FRotator Rotator = (TargetLocation - SocketLocation).Rotation();
-			Rotator.Pitch = 0.f;
+			const FRotator Rotator = (TargetLocation - SocketLocation).Rotation();
 
 			FTransform SpawnTransform;
 			SpawnTransform.SetLocation(SocketLocation);
@@ -50,9 +49,13 @@ void UAuraProjectileSpell::SpawnFireBolt(const FVector TargetLocation) const
 			const FGameplayEffectSpecHandle EffectSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
 
 			const FAuraGameplayTags AuraGameplayTags = FAuraGameplayTags::Get();
-			const float ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 
-			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle,AuraGameplayTags.Damage, ScaledDamage);
+			for (auto& Pair : DamageType)
+			{
+				const float ScaledDamage = Pair.Value.GetValueAtLevel(GetAbilityLevel());
+				UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(EffectSpecHandle,Pair.Key, ScaledDamage);
+			}
+
 			Projectile->DamageEffectSpecHandle = EffectSpecHandle;
 			
 			if (Projectile)
