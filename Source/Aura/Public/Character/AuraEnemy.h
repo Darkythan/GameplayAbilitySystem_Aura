@@ -25,7 +25,9 @@ public:
 	virtual void HighlightActor() override;
 	virtual void UnHighlightActor() override;
 	virtual void PossessedBy(AController* NewController) override;
-
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
+	
 	virtual int32 GetLevel() override;
 
 	UPROPERTY(BlueprintAssignable)
@@ -46,6 +48,9 @@ public:
 	float LifeSpan = 5.f;
 	
 	virtual void Die() override;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<AActor> CombatTarget;
 
 protected:
 	virtual void BeginPlay() override;

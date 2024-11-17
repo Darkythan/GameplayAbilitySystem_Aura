@@ -28,7 +28,7 @@ public:
 	static void InitializeDefaultAttributes(ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* AbilitySystemComponent, const UObject* WorldContext);
 
 	UFUNCTION(BlueprintCallable)
-	static void GiveStartupAbilities(UAbilitySystemComponent* AbilitySystemComponent, const UObject* WorldContext);
+	static void GiveStartupAbilities(UAbilitySystemComponent* AbilitySystemComponent, ECharacterClass CharacterClass, const UObject* WorldContext);
 
 	UFUNCTION(BlueprintCallable)
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContext);
@@ -44,4 +44,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static void SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bCriticalHit);
+
+	UFUNCTION(BlueprintCallable)
+	static void GetLivePlayerWithinRadius(TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereLocation, const UObject* WorldContext);
 };

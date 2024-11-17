@@ -61,6 +61,16 @@ void AAuraEnemy::PossessedBy(AController* NewController)
 	AuraAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 }
 
+void AAuraEnemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+}
+
+AActor* AAuraEnemy::GetCombatTarget_Implementation() const
+{
+	return CombatTarget;
+}
+
 int32 AAuraEnemy::GetLevel()
 {
 	return Level;
@@ -87,7 +97,7 @@ void AAuraEnemy::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		UAuraAbilityFunctionLibrary::GiveStartupAbilities(AbilitySystemComponent, this);	
+		UAuraAbilityFunctionLibrary::GiveStartupAbilities(AbilitySystemComponent, CharacterClass, this);	
 	}
 
 	if (UAuraWidget* AuraWidget = Cast<UAuraWidget>(HealthBar->GetUserWidgetObject()))
