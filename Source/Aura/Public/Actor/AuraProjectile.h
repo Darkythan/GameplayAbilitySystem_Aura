@@ -26,10 +26,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintCallable)
+	virtual void OnHit();
+	virtual void Destroyed() override;
+
+	bool IsValidOverlap(const AActor* OtherActor) const;
+	
 	UFUNCTION()
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	virtual void Destroyed() override;
 	
 private:
 	UPROPERTY(EditDefaultsOnly)

@@ -134,7 +134,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 
 			const bool bBlock = UAuraAbilityFunctionLibrary::IsBlockedHit(Props.EffectContextHandle);
 			const bool bCriticalHit = UAuraAbilityFunctionLibrary::IsCriticalHit(Props.EffectContextHandle);
-			//ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
+			ShowFloatingText(Props, LocalIncomingDamage, bBlock, bCriticalHit);
 		}
 	}
 }
@@ -233,8 +233,8 @@ void UAuraAttributeSet::OnRep_PhysicalResistance(const FGameplayAttributeData& O
 
 void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props)
 {
-	const FGameplayEffectContextHandle EffectContextHandle = Data.EffectSpec.GetContext(); 
-	Props.EffectContextHandle = EffectContextHandle;
+	Props.EffectContextHandle = Data.EffectSpec.GetContext();
+	Props.SourceASC = Props.EffectContextHandle.GetOriginalInstigatorAbilitySystemComponent();
 
 	if (IsValid(Props.SourceASC) && Props.SourceASC->AbilityActorInfo.IsValid() && Props.SourceASC->AbilityActorInfo->AvatarActor.IsValid())
 	{
@@ -249,9 +249,10 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		}
 		if (Props.SourceController)
 		{
-			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());;
+			Props.SourceCharacter = Cast<ACharacter>(Props.SourceController->GetPawn());
 		}
 	}
+
 	if (Data.Target.AbilityActorInfo.IsValid() && Data.Target.AbilityActorInfo->AvatarActor.IsValid())
 	{
 		Props.TargetAvatarActor = Data.Target.AbilityActorInfo->AvatarActor.Get();
@@ -263,18 +264,17 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 
 void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& EffectProperties, float Damage, bool bBlocked, bool bCriticalHit) const
 {
+	if (!IsValid(EffectProperties.SourceCharacter) || !IsValid(EffectProperties.TargetCharacter)) return;
 	if (EffectProperties.SourceCharacter != EffectProperties.TargetCharacter)
 	{
-		if (AAuraPlayerController* AuraPlayerController =
-			Cast<AAuraPlayerController>(EffectProperties.SourceCharacter->Controller))
+		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(EffectProperties.SourceCharacter->Controller))
 		{
-			AuraPlayerController->ShowDamageNumber(Damage, EffectProperties.TargetCharacter, bBlocked, bCriticalHit);
+			PC->ShowDamageNumber(Damage, EffectProperties.TargetCharacter, bBlocked, bCriticalHit);
 			return;
 		}
-		if (AAuraPlayerController* AuraPlayerController =
-			Cast<AAuraPlayerController>(EffectProperties.TargetCharacter->Controller))
+		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(EffectProperties.TargetCharacter->Controller))
 		{
-			AuraPlayerController->ShowDamageNumber(Damage, EffectProperties.TargetCharacter, bBlocked, bCriticalHit);
+			PC->ShowDamageNumber(Damage, EffectProperties.TargetCharacter, bBlocked, bCriticalHit);
 		}
 	}
 }
