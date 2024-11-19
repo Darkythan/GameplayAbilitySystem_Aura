@@ -21,7 +21,7 @@ void UAuraProjectileSpell::SpawnFireBolt(const FVector TargetLocation) const
 	if (GetAvatarActorFromActorInfo()->HasAuthority())
 	{
 		const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(
-			GetAvatarActorFromActorInfo(), FAuraGameplayTags::Get().Montage_Attack_Weapon);
+			GetAvatarActorFromActorInfo(), FAuraGameplayTags::Get().CombatSocket_Weapon);
 		const FRotator Rotator = (TargetLocation - SocketLocation).Rotation();
 
 		FTransform SpawnTransform;
