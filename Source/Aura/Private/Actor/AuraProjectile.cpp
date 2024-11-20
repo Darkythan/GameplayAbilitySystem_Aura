@@ -18,7 +18,7 @@ AAuraProjectile::AAuraProjectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-	
+
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	SetRootComponent(Sphere);
 	Sphere->SetCollisionObjectType(ECC_Projectile);
@@ -28,7 +28,7 @@ AAuraProjectile::AAuraProjectile()
 	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
-	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("Projectile");
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovementComponent->InitialSpeed = 550.f;
 	ProjectileMovementComponent->MaxSpeed = 550.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
@@ -39,56 +39,54 @@ void AAuraProjectile::BeginPlay()
 	Super::BeginPlay();
 	SetLifeSpan(LifeSpan);
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereOverlap);
+
 	LoopingAudioComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
 }
 
-void AAuraProjectile::OnHit()
+void AAuraProjectile::Destroyed()
 {
-	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-	if (LoopingAudioComponent)
+	if (!bHit && !HasAuthority())
 	{
-		LoopingAudioComponent->Stop();
-		LoopingAudioComponent->DestroyComponent();
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+		if (LoopingAudioComponent) LoopingAudioComponent->Stop();
+		bHit = true;
 	}
-	bHit = true;
+	Super::Destroyed();
 }
 
 void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
                                       UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!IsValidOverlap(OtherActor)) return;
-	if (!bHit) OnHit();
-	
+	if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor)
+	{
+		return;
+	}
+	if (!UAuraAbilityFunctionLibrary::IsNotFriend(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor))
+	{
+		return;
+	}
+	if (!bHit)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+		if (LoopingAudioComponent) LoopingAudioComponent->Stop();
+		bHit = true;
+	}
+
+
 	if (HasAuthority())
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
 			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
 		}
+
 		Destroy();
 	}
-	
-}
-
-void AAuraProjectile::Destroyed()
-{
-	if (LoopingAudioComponent)
+	else
 	{
-		LoopingAudioComponent->Stop();
-		LoopingAudioComponent->DestroyComponent();
+		bHit = true;
 	}
-	if (!bHit && !HasAuthority()) OnHit();
-	Super::Destroyed();
-}
-
-bool AAuraProjectile::IsValidOverlap(const AActor* OtherActor) const
-{
-	if (UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser()) == nullptr) return false;
-	const AActor* SourceAvatarActor = DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser();
-	if (SourceAvatarActor == OtherActor) return false;
-	if (!UAuraAbilityFunctionLibrary::IsNotFriend(SourceAvatarActor, OtherActor)) return false;
-
-	return true;
 }
 
