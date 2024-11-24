@@ -158,6 +158,7 @@ void AAuraCharacterBase::AddCharacterAbilities()
 	if (AuraAbilitySystemComponent)
 	{
 		AuraAbilitySystemComponent->AddCharacterAbilities(StartupAbilities);
+		AuraAbilitySystemComponent->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 	}
 }
 
