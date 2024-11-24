@@ -27,7 +27,7 @@ public:
 	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
 	virtual AActor* GetCombatTarget_Implementation() const override;
 	
-	virtual int32 GetLevel() override;
+	virtual int32 GetPlayerLevel_Implementation() override;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChange;
