@@ -10,17 +10,16 @@
 
 void UMenuWidgetController::BindCallbacksToDependencies()
 {
-	UAuraAttributeSet* AS = CastChecked<UAuraAttributeSet>(AttributeSet);
-	for (auto& Pair : AS->TagsToAttributes)
+	check(AttributeInfo);
+	for (auto& Pair : GetAuraAS()->TagsToAttributes)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Pair.Value()).AddLambda(
-			[this, Pair, AS](const FOnAttributeChangeData& Data)
+			[this, Pair](const FOnAttributeChangeData& Data)
 			{
 				BroadcastAttributeInfo(Pair.Key, Pair.Value());
 			});
 		
-		AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-		AuraPlayerState->OnAttributePointsChangedDelegate.AddLambda(
+		GetAuraPS()->OnAttributePointsChangedDelegate.AddLambda(
 			[this](int32 Points)
 			{
 				AttributePointsChangedDelegate.Broadcast(Points);
@@ -38,8 +37,7 @@ void UMenuWidgetController::BroadcastInitialValues()
 	{
 		BroadcastAttributeInfo(Pair.Key, Pair.Value());
 	}
-	AAuraPlayerState* AuraPlayerState = CastChecked<AAuraPlayerState>(PlayerState);
-	AttributePointsChangedDelegate.Broadcast(AuraPlayerState->GetAttributePoints());
+	AttributePointsChangedDelegate.Broadcast(GetAuraPS()->GetAttributePoints());
 }
 
 void UMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
