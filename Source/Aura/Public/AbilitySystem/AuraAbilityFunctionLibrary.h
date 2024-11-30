@@ -8,6 +8,7 @@
 #include "Data/CharacterClassInfo.h"
 #include "AuraAbilityFunctionLibrary.generated.h"
 
+class UAbilityInfo;
 class AAuraHUD;
 struct FWidgetControllerParams;
 class UAbilitySystemComponent;
@@ -42,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContext);
+	
+	UFUNCTION(BlueprintCallable, Category="AuraAbilitySystemLibrary|CharacterClassDefaults")
+	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure)
 	static bool IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);

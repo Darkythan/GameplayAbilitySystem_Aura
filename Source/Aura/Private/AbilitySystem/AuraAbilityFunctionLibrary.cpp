@@ -111,11 +111,16 @@ void UAuraAbilityFunctionLibrary::GiveStartupAbilities(UAbilitySystemComponent* 
 
 UCharacterClassInfo* UAuraAbilityFunctionLibrary::GetCharacterClassInfo(const UObject* WorldContext)
 {
-	if (const AAuraGameModeBase* AuraGameModeBase = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContext)))
-	{
-		return AuraGameModeBase->CharacterClassInfo;
-	}
-	return nullptr;
+	const AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContext));
+	if (AuraGameMode == nullptr) return nullptr;
+	return AuraGameMode->CharacterClassInfo;
+}
+
+UAbilityInfo* UAuraAbilityFunctionLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	const AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (AuraGameMode == nullptr) return nullptr;
+	return AuraGameMode->AbilityInfo;
 }
 
 bool UAuraAbilityFunctionLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
