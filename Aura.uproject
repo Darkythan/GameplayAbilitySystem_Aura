@@ -12,7 +12,10 @@
 				"Engine",
 				"GameplayAbilities",
 				"UMG",
-				"CoreUObject"
+				"CoreUObject",
+				"EnhancedInput",
+				"AIModule",
+				"Niagara"
 			]
 		}
 	],
