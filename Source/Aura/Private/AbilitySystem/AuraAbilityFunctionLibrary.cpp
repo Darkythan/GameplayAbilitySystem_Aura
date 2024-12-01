@@ -3,7 +3,9 @@
 
 #include "AbilitySystem/AuraAbilityFunctionLibrary.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "Game/AuraGameModeBase.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -186,8 +188,28 @@ bool UAuraAbilityFunctionLibrary::IsNotFriend(const AActor* FirstActor, const AA
 	return !bFriends;
 }
 
+FGameplayEffectContextHandle UAuraAbilityFunctionLibrary::ApplyDamageEffect(
+	const FDamageEffectParams& DamageEffectParams)
+{
+	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
+	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	
+	FGameplayEffectContextHandle EffectContexthandle = DamageEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+	EffectContexthandle.AddSourceObject(SourceAvatarActor);
+	
+	const FGameplayEffectSpecHandle SpecHandle = DamageEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(DamageEffectParams.DamageGameplayEffectClass, DamageEffectParams.AbilityLevel, EffectContexthandle);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, DamageEffectParams.DamageType, DamageEffectParams.BaseDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Debuff_Chance, DamageEffectParams.DebuffChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Debuff_Damage, DamageEffectParams.DebuffDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Debuff_Duration, DamageEffectParams.DebuffDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Debuff_Frequency, DamageEffectParams.DebuffFrequency);
+	
+	DamageEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	return EffectContexthandle;
+}
+
 int32 UAuraAbilityFunctionLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject,
-	ECharacterClass CharacterClass, int32 CharacterLevel)
+                                                               ECharacterClass CharacterClass, int32 CharacterLevel)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	if (CharacterClassInfo == nullptr) return 0;
