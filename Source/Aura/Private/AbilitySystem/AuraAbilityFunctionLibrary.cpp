@@ -200,6 +200,15 @@ FVector UAuraAbilityFunctionLibrary::GetDeathImpulse(const FGameplayEffectContex
 	return FVector::ZeroVector;
 }
 
+FVector UAuraAbilityFunctionLibrary::GetKnockbackForce(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FAuraGameplayEffectContext* AuraEffectContext = static_cast<const FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return AuraEffectContext->GetKnockbackForce();
+	}
+	return FVector::ZeroVector;
+}
+
 void UAuraAbilityFunctionLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bBlocked)
 {
 	if (FAuraGameplayEffectContext* AuraContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -266,6 +275,15 @@ void UAuraAbilityFunctionLibrary::SetDeathImpulse(FGameplayEffectContextHandle& 
 	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
 		AuraEffectContext->SetDeathImpulse(InImpulse);
+	}
+}
+
+void UAuraAbilityFunctionLibrary::SetKnockbackForce(FGameplayEffectContextHandle& EffectContextHandle,
+	const FVector& InForce)
+{
+	if (FAuraGameplayEffectContext* AuraEffectContext = static_cast<FAuraGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		AuraEffectContext->SetKnockbackForce(InForce);
 	}
 }
 
