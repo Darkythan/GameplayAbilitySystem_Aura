@@ -145,6 +145,11 @@ FOnASCRegistered AAuraCharacterBase::GetOnASCRegisteredDelegate()
 	return OnAscRegistered;
 }
 
+USkeletalMeshComponent* AAuraCharacterBase::GetWeapon_Implementation()
+{
+	return Weapon;
+}
+
 void AAuraCharacterBase::ApplyGameplayToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
 	check(GetAbilitySystemComponent());

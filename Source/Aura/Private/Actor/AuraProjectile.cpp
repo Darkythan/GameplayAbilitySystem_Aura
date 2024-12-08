@@ -47,12 +47,21 @@ void AAuraProjectile::OnHit()
 {
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
-	if (LoopingAudioComponent) LoopingAudioComponent->Stop();
+	if (LoopingAudioComponent)
+	{
+		LoopingAudioComponent->Stop();
+		LoopingAudioComponent->DestroyComponent();
+	}
 	bHit = true;
 }
 
 void AAuraProjectile::Destroyed()
 {
+	if (LoopingAudioComponent)
+	{
+		LoopingAudioComponent->Stop();
+		LoopingAudioComponent->DestroyComponent();
+	}
 	if (!bHit && !HasAuthority()) OnHit();
 	Super::Destroyed();
 }
