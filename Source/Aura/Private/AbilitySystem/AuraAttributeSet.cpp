@@ -8,6 +8,7 @@
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/AuraAbilityFunctionLibrary.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -314,7 +315,22 @@ void UAuraAttributeSet::Debuff(const FEffectProperties& Props)
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->Period = DebuffFrequency;
 	Effect->DurationMagnitude = FScalableFloat(DebuffDuration);
-	Effect->CachedGrantedTags.AddTag(GameplayTags.DamageTypesToDebuffs[DamageType]);
+	const FGameplayTag DebuffTag = GameplayTags.DamageTypesToDebuffs[DamageType];
+
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(DebuffTag);
+
+	if (DebuffTag.MatchesTagExact(GameplayTags.Debuff_Stun))
+	{
+		// Stunned, so block input
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_CursorTrace);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputHeld);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputPressed);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputReleased);
+	}
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
 	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
 	Effect->StackLimitCount = 1;
 
