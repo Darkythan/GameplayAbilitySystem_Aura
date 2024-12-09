@@ -103,7 +103,7 @@ void AAuraEnemy::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		UAuraAbilityFunctionLibrary::GiveStartupAbilities(AbilitySystemComponent, CharacterClass, this);	
+		UAuraAbilityFunctionLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);	
 	}
 
 	if (UAuraWidget* AuraWidget = Cast<UAuraWidget>(HealthBar->GetUserWidgetObject()))
@@ -147,7 +147,7 @@ void AAuraEnemy::InitAbilityActorInfo()
 
 void AAuraEnemy::InitializeDefaultAttributes() const
 {
-	UAuraAbilityFunctionLibrary::InitializeDefaultAttributes(CharacterClass, Level, AbilitySystemComponent, this);
+	UAuraAbilityFunctionLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
 
 void AAuraEnemy::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)

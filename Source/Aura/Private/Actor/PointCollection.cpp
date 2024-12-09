@@ -81,7 +81,7 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(const FVector& Ground
 
 		FHitResult HitResult;
 		TArray<AActor*> IgnoreActors;
-		UAuraAbilityFunctionLibrary::GetLivePlayerWithinRadius(IgnoreActors, TArray<AActor*>(), 1500.f, GetActorLocation(), this);
+		UAuraAbilityFunctionLibrary::GetLivePlayersWithinRadius(this, IgnoreActors, TArray<AActor*>(), 1500.f, GetActorLocation());
 
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActors(IgnoreActors);
