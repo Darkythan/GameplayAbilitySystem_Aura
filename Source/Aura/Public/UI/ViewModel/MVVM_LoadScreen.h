@@ -41,7 +41,13 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DeleteButtonPressed();
 	
+	UFUNCTION(BlueprintCallable)
+	void PlayButtonPressed();
+	
 	void LoadData();
+	
+	void SetNumSlots(int32 InNumSlots);
+	int32 GetNumSlots() const { return NumSlots; }
 
 private:
 
@@ -59,4 +65,7 @@ private:
 	
 	UPROPERTY()
 	UMVVM_LoadSlot* SelectedSlot;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess="true"));
+	int32 NumSlots;
 };
