@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AuraGameplayTags.h"
 #include "NiagaraComponent.h"
+#include "AbilitySystem/AuraAbilityFunctionLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
@@ -49,7 +50,7 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	InitAbilityActorInfo();
-	AddCharacterAbilities();
+	LoadProgress();
 }
 
 void AAuraCharacter::OnRep_PlayerState()
@@ -175,6 +176,7 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		SaveData->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
 
+		SaveData->bFirstTimeLoadIn = false;
 		AuraGameMode->SaveInGameProgressData(SaveData);
 	}
 }
@@ -218,6 +220,36 @@ void AAuraCharacter::OnRep_Burned()
 	else
 	{
 		BurnDebuffComponent->Deactivate();
+	}
+}
+
+void AAuraCharacter::LoadProgress()
+{
+	AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AuraGameMode)
+	{
+		ULoadScreenSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitializeDefaultAttributes();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			//TODO: Load in Abilities from disk
+
+			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
+			{
+				AuraPlayerState->SetLevel(SaveData->PlayerLevel);
+				AuraPlayerState->SetXP(SaveData->XP);
+				AuraPlayerState->SetAttributePoints(SaveData->AttributePoints);
+				AuraPlayerState->SetSpellPoints(SaveData->SpellPoints);
+			}
+
+			UAuraAbilityFunctionLibrary::InitializeDefaultAttributesFromSaveData(this, AbilitySystemComponent, SaveData);
+		}
 	}
 }
 

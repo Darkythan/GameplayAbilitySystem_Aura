@@ -23,3 +23,8 @@ void UMVVM_LoadSlot::SetSlotName(FString InSlotName)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(SlotName, InSlotName);
 }
+
+void UMVVM_LoadSlot::SetPlayerLevel(int32 InLevel)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(PlayerLevel, InLevel);
+}
