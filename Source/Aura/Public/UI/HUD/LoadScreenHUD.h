@@ -1,4 +1,4 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 #pragma once
 
@@ -15,7 +15,6 @@ UCLASS()
 class AURA_API ALoadScreenHUD : public AHUD
 {
 	GENERATED_BODY()
-	
 public:
 
 	UPROPERTY(EditDefaultsOnly)

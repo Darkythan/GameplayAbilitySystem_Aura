@@ -8,12 +8,12 @@
 #include "Data/CharacterClassInfo.h"
 #include "AuraAbilityFunctionLibrary.generated.h"
 
+class UAttributeMenuWidgetController;
 class USpellMenuWidgetController;
 class UAbilityInfo;
 class AAuraHUD;
 struct FWidgetControllerParams;
 class UAbilitySystemComponent;
-class UMenuWidgetController;
 class UOverlayWidgetController;
 /**
  * 
@@ -35,7 +35,7 @@ public:
 	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static UOverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
-	static UMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
+	static UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category="AuraAbilitySystemLibrary|WidgetController", meta = (DefaultToSelf = "WorldContextObject"))
 	static USpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* WorldContextObject);
 

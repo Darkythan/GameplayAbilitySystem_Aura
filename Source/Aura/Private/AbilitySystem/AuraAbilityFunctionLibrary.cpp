@@ -45,13 +45,13 @@ UOverlayWidgetController* UAuraAbilityFunctionLibrary::GetOverlayWidgetControlle
 	return nullptr;
 }
 
-UMenuWidgetController* UAuraAbilityFunctionLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
+UAttributeMenuWidgetController* UAuraAbilityFunctionLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
 	FWidgetControllerParams WCParams;
 	AAuraHUD* AuraHUD = nullptr;
 	if (MakeWidgetControllerParams(WorldContextObject, WCParams, AuraHUD))
 	{
-		return AuraHUD->GetMenuWidgetController(WCParams);
+		return AuraHUD->GetAttributeMenuWidgetController(WCParams);
 	}
 	return nullptr;
 }

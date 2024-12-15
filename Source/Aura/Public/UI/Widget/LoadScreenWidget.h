@@ -1,4 +1,4 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 #pragma once
 
@@ -13,8 +13,8 @@ UCLASS()
 class AURA_API ULoadScreenWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
 public:
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void BlueprintInitializeWidget();
 };

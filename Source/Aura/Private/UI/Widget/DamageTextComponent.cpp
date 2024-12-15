@@ -1,4 +1,4 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 
 #include "UI/Widget/DamageTextComponent.h"

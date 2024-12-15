@@ -1,4 +1,4 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 
 #include "UI/HUD/LoadScreenHUD.h"
@@ -10,7 +10,7 @@
 void ALoadScreenHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	LoadScreenViewModel = NewObject<UMVVM_LoadScreen>(this, LoadScreenViewModelClass);
 	LoadScreenViewModel->InitializeLoadSlots();
 

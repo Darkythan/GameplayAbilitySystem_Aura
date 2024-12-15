@@ -1,11 +1,11 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 
 #include "UI/WidgetController/SpellMenuWidgetController.h"
 
-#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "Player/AuraPlayerState.h"
 
 void USpellMenuWidgetController::BroadcastInitialValues()
 {
@@ -36,6 +36,7 @@ void USpellMenuWidgetController::BindCallbacksToDependencies()
 			AbilityInfoDelegate.Broadcast(Info);
 		}
 	});
+
 	GetAuraASC()->AbilityEquipped.AddUObject(this, &USpellMenuWidgetController::OnAbilityEquipped);
 
 	GetAuraPS()->OnSpellPointsChangedDelegate.AddLambda([this](int32 SpellPoints)
@@ -78,7 +79,7 @@ void USpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& AbilityT
 	{
 		AbilityStatus = GetAuraASC()->GetStatusFromSpec(*AbilitySpec);
 	}
-	
+
 	SelectedAbility.Ability = AbilityTag;
 	SelectedAbility.Status = AbilityStatus;
 	bool bEnableSpendPoints = false;
@@ -119,6 +120,12 @@ void USpellMenuWidgetController::EquipButtonPressed()
 
 	WaitForEquipDelegate.Broadcast(AbilityType);
 	bWaitingForEquipSelection = true;
+
+	const FGameplayTag SelectedStatus = GetAuraASC()->GetStatusFromAbilityTag(SelectedAbility.Ability);
+	if (SelectedStatus.MatchesTagExact(FAuraGameplayTags::Get().Abilities_Status_Equipped))
+	{
+		SelectedSlot = GetAuraASC()->GetSlotFromAbilityTag(SelectedAbility.Ability);
+	}
 }
 
 void USpellMenuWidgetController::SpellRowGlobePressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
@@ -128,13 +135,14 @@ void USpellMenuWidgetController::SpellRowGlobePressed(const FGameplayTag& SlotTa
 	// (don't equip an offensive spell in a passive slot and vice versa)
 	const FGameplayTag& SelectedAbilityType = AbilityInfo->FindAbilityInfoForTag(SelectedAbility.Ability).AbilityType;
 	if (!SelectedAbilityType.MatchesTagExact(AbilityType)) return;
+
 	GetAuraASC()->ServerEquipAbility(SelectedAbility.Ability, SlotTag);
 }
 
-void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status,
-	const FGameplayTag& Slot, const FGameplayTag& PreviousSlot)
+void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot)
 {
 	bWaitingForEquipSelection = false;
+
 	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
 	
 	FAuraAbilityInfo LastSlotInfo;
@@ -143,18 +151,18 @@ void USpellMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTa
 	LastSlotInfo.AbilityTag = GameplayTags.Abilities_None;
 	// Broadcast empty info if PreviousSlot is a valid slot. Only if equipping an already-equipped spell
 	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
 	FAuraAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
 	Info.StatusTag = Status;
 	Info.InputTag = Slot;
 	AbilityInfoDelegate.Broadcast(Info);
-	
+
 	StopWaitingForEquipDelegate.Broadcast(AbilityInfo->FindAbilityInfoForTag(AbilityTag).AbilityType);
 	SpellGlobeReassignedDelegate.Broadcast(AbilityTag);
-    GlobeDeselect();
+	GlobeDeselect();
 }
 
-void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints,
-                                                     bool& bShouldEnableSpellPointsButton, bool& bShouldEnableEquipButton)
+void USpellMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SpellPoints, bool& bShouldEnableSpellPointsButton, bool& bShouldEnableEquipButton)
 {
 	const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
 

@@ -1,30 +1,36 @@
-// Copyright Manel Quintana
+// Copyright Druid Mechanics
 
 
 #include "UI/WidgetController/AuraWidgetController.h"
 
+#include "Player/AuraPlayerController.h"
+#include "Player/AuraPlayerState.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
+#include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 
-void UAuraWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WidgetControllerParams)
+void UAuraWidgetController::SetWidgetControllerParams(const FWidgetControllerParams& WCParams)
 {
-	PlayerController = WidgetControllerParams.PlayerController;
-	PlayerState = WidgetControllerParams.PlayerState;
-	AbilitySystemComponent = WidgetControllerParams.AbilitySystemComponent;
-	AttributeSet = WidgetControllerParams.AttributeSet;
+	PlayerController = WCParams.PlayerController;
+	PlayerState = WCParams.PlayerState;
+	AbilitySystemComponent = WCParams.AbilitySystemComponent;
+	AttributeSet = WCParams.AttributeSet;
 }
 
 void UAuraWidgetController::BroadcastInitialValues()
 {
+	
 }
 
 void UAuraWidgetController::BindCallbacksToDependencies()
 {
+	
 }
 
 void UAuraWidgetController::BroadcastAbilityInfo()
 {
 	if (!GetAuraASC()->bStartupAbilitiesGiven) return;
+
 	FForEachAbility BroadcastDelegate;
 	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec)
 	{
