@@ -45,6 +45,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
 	float LifeSpan = 5.f;
 	
+	void SetLevel(int32 InLevel) { Level = InLevel; }
+	
 	virtual void Die(const FVector& DeathImpulse) override;
 
 	UPROPERTY(BlueprintReadWrite)

@@ -35,6 +35,8 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TArray<FTaggedMontage> AttackMontages;
+
+	void SetCharacterClass(ECharacterClass InClass) { CharacterClass = InClass; }
 	
 protected:
 	virtual void BeginPlay() override;
