@@ -1,4 +1,4 @@
-// Copyright Druid Mechanics
+// Copyright Manel Quintana
 
 
 #include "UI/HUD/AuraHUD.h"
